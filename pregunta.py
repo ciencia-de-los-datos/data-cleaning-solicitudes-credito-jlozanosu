@@ -1,61 +1,49 @@
-""
+"""
 Limpieza de datos usando Pandas
 -----------------------------------------------------------------------------------------
 Realice la limpieza del dataframe. Los tests evaluan si la limpieza fue realizada 
 correctamente. Tenga en cuenta datos faltantes y duplicados.
 """
+
 import pandas as pd
-from datetime import datetime
 
 def clean_data():
 
-    df = pd.read_csv('solicitudes_credito.csv', sep = ';', index_col = [0])
-    df_clean = df.copy()
-    df_clean = df.drop_duplicates(keep='last')
-    df_clean = df_clean.dropna(axis = 0, how = "any")
-    ###########
-    df_clean.sexo = df_clean.sexo.str.lower()
-    df_clean.tipo_de_emprendimiento = df_clean.tipo_de_emprendimiento.str.lower()
-    ####################
-    df_clean.barrio = df_clean.barrio.str.replace('-',' ')
-    df_clean.barrio = df_clean.barrio.str.replace(' ','_')
-    df_clean.barrio = df_clean.barrio.str.lower()
-  
-    ##############
-    df_clean.idea_negocio = df_clean.idea_negocio.str.replace('-',' ')
-    df_clean.idea_negocio = df_clean.idea_negocio.str.replace('_',' ')
-    df_clean.idea_negocio = df_clean.idea_negocio.str.strip()
-    df_clean.idea_negocio = df_clean.idea_negocio.str.lower()
+    df = pd.read_csv("solicitudes_credito.csv", sep=";", )
+    df= df[df.columns[1:]]
+    df.columns.values
 
-    ##############
-    df_clean.comuna_ciudadano = df_clean.comuna_ciudadano.astype('int')
+    # sexo
+    df['sexo']= df['sexo'].str.lower() 
 
-    ##############
-    df_clean.monto_del_credito = df_clean.monto_del_credito.str.replace('$', '')
-    df_clean.monto_del_credito = df_clean.monto_del_credito.str.replace(',', '')
-    df_clean.monto_del_credito = df_clean.monto_del_credito.str.strip()
-    df_clean.monto_del_credito = pd.to_numeric(df_clean.monto_del_credito)
-    df_clean.monto_del_credito = df_clean.monto_del_credito.astype('int')
+    # tipo emprendimiento
+    df['tipo_de_emprendimiento']= df['tipo_de_emprendimiento'].str.lower()
 
-    ##############
-    df_clean.línea_credito = df_clean.línea_credito.str.replace('-', ' ')
-    df_clean.línea_credito = df_clean.línea_credito.str.replace('_', ' ')
-    df_clean.línea_credito = df_clean.línea_credito.str.strip()
-    df_clean.línea_credito = df_clean.línea_credito.str.lower()
+    # idea_negocio
+    df['idea_negocio']= df['idea_negocio'].str.lower()
+    df['idea_negocio']=df['idea_negocio'].str.replace("-","_")
+    df['idea_negocio']=df['idea_negocio'].str.replace("_"," ")
+    df['idea_negocio']=df['idea_negocio'].str.strip()
 
-    
+    # Barrio
+    df['barrio']= df['barrio'].str.lower()
+    df['barrio']=df['barrio'].str.replace("-","_")
+    df['barrio']=df['barrio'].str.replace("_"," ")
 
-    def fecha(data_fecha):
-        try:
-            df_clean_fecha = datetime.strptime(data_fecha, '%d/%m/%Y')
-            
-        except:
-            df_clean_fecha = datetime.strptime(data_fecha, '%Y/%m/%d')
+    # línea_credito
+    df['línea_credito']= df['línea_credito'].str.lower()
+    df['línea_credito']=df['línea_credito'].str.replace("-","_")
+    df['línea_credito']=df['línea_credito'].str.replace("_"," ")
+    df['línea_credito']=df['línea_credito'].str.replace(".","")
+    df['línea_credito']=df['línea_credito'].str.strip()
 
-        return df_clean_fecha
+    # fecha_de_beneficio
+    df.fecha_de_beneficio = pd.to_datetime(df.fecha_de_beneficio,dayfirst=True)
 
-    df_clean.fecha_de_beneficio = df_clean.fecha_de_beneficio.map(fecha)
-
-    df_clean = df_clean.drop_duplicates(keep='last')
-
-    return df_clean
+    # monto_del_credito
+    df['monto_del_credito']=df['monto_del_credito'].str.replace(",","")
+    df['monto_del_credito']=df['monto_del_credito'].str.replace("$","")
+    df['monto_del_credito']=df['monto_del_credito'].str.strip()
+    df['monto_del_credito'] = df['monto_del_credito'].apply(pd.to_numeric, downcast="integer", errors='ignore')
+    df.drop_duplicates(inplace=True)
+    df.dropna(inplace=True)
