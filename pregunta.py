@@ -1,84 +1,43 @@
 """
 Limpieza de datos usando Pandas
 -----------------------------------------------------------------------------------------
-Realice la limpiezaa del dataframe. Los tests evaluan si la limpieza fue realizada 
+Realice la limpieza del dataframe. Los tests evaluan si la limpieza fue realizada 
 correctamente. Tenga en cuenta datos faltantes y duplicados.
 """
 import pandas as pd
 
-from typing   import Union
-from datetime import datetime
-
 
 def clean_data():
-    data = pd.read_csv('solicitudes_credito.csv', sep=';', 
-                        index_col='Unnamed: 0', encoding='utf8')
-    data_clean = data.copy()
-    data_clean.dropna(axis=0, how='any', inplace=True)
 
-    def edit_idea_negocio(val:str) -> Union[str, float]:
-        """
-        Clean string value.
-        Input:
-            - val: String. String to clean
-        Return:
-            - val: Clean string
-        """
+    df = pd.read_csv("solicitudes_credito.csv", sep=";")
 
-        val = val.replace('-', ' ')
-        val = val.replace('_', ' ')
-        val = val.strip()  
-
-        return val
-
-    
-    data_clean.monto_del_credito = (data_clean.monto_del_credito
-                                    .str.replace('[^\d.]+', '', regex=True))
-    
-    
-    data_clean.fecha_de_beneficio = (
-                                pd.to_datetime(data_clean.fecha_de_beneficio, 
-                                            format='%d/%m/%Y', errors='coerce')
-                                .fillna(pd.to_datetime(
-                                    data_clean.fecha_de_beneficio, 
-                                    format='%Y/%m/%d', errors='coerce')))
-
-    # Verify that columns can be converted to appropriate types
-    types = {
-        'sexo': 'category',
-        'tipo_de_emprendimiento': 'category',
-        'idea_negocio': str,
-        'barrio': str,
-        'estrato': int,
-        'comuna_ciudadano': int,
-        'fecha_de_beneficio': str,
-        'monto_del_credito': float,
-        'línea_credito': str
-    }
-
-    data_clean = data_clean.astype(types)
-    data_clean.fecha_de_beneficio = pd.to_datetime(data_clean.fecha_de_beneficio)
-
-    
-    data_clean.sexo = data_clean.sexo.str.lower()
-    data_clean.tipo_de_emprendimiento = data_clean.tipo_de_emprendimiento.str.lower()
-    data_clean.idea_negocio = data_clean.idea_negocio.str.lower()
-    data_clean.barrio = data_clean.barrio.str.lower()
-    data_clean.línea_credito = data_clean.línea_credito.str.lower()
-
-    
-    data_clean.idea_negocio = data_clean.idea_negocio.transform(
-                                                lambda x: edit_idea_negocio(x))
-    data_clean.tipo_de_emprendimiento = (data_clean.tipo_de_emprendimiento
-                                    .transform(lambda x: edit_idea_negocio(x)))
-    data_clean.línea_credito = data_clean.línea_credito.transform(
-                                                lambda x: edit_idea_negocio(x))
-    
-    data_clean.barrio = data_clean.barrio.str.replace('-',' ')
-    data_clean.barrio = data_clean.barrio.str.replace(' ','_')
-    data_clean.barrio = data_clean.barrio.str.lower()
-
-   
-    data_clean.drop_duplicates(inplace=True, keep='last')
-
-    return data_clean
+    #
+    # Inserte su código aquí
+    #
+    df= df[df.columns[1:]]
+    df.drop_duplicates(inplace=True)
+    df.dropna(inplace=True)
+    df.columns.values
+    df['sexo']= df['sexo'].str.lower() 
+    df['tipo_de_emprendimiento']= df['tipo_de_emprendimiento'].str.lower()
+    df['idea_negocio']= df['idea_negocio'].str.lower()
+    df['idea_negocio']=df['idea_negocio'].str.replace("-","_")
+    df['idea_negocio']=df['idea_negocio'].str.replace("_"," ")
+    df['idea_negocio']=df['idea_negocio'].str.strip()
+    df['barrio']= df['barrio'].str.lower()
+    df['barrio']=df['barrio'].str.replace("-","_")
+    df['barrio']=df['barrio'].str.replace("_"," ")
+    df['línea_credito']= df['línea_credito'].str.lower()
+    df['línea_credito']=df['línea_credito'].str.replace("-","_")
+    df['línea_credito']=df['línea_credito'].str.replace("_"," ")
+    df['línea_credito']=df['línea_credito'].str.replace(".","")
+    df['línea_credito']=df['línea_credito'].str.strip()
+    df.fecha_de_beneficio = pd.to_datetime(df.fecha_de_beneficio,dayfirst=True)
+    df['monto_del_credito']=df['monto_del_credito'].str.replace(",","")
+    df['monto_del_credito']=df['monto_del_credito'].str.replace("$","")
+    df['monto_del_credito']=df['monto_del_credito'].str.strip()
+    df['monto_del_credito'] = df['monto_del_credito'].apply(pd.to_numeric, downcast="integer", errors='ignore')
+    df.drop_duplicates(inplace=True)
+    df.dropna(inplace=True)
+    return df
+Footer
